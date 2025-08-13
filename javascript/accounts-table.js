@@ -1,0 +1,1 @@
+// Placeholder for legacy references. Real logic lives in accounts.js
