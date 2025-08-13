@@ -1,0 +1,1 @@
+// Placeholder for any table-specific enhancements required by Accounts module.
