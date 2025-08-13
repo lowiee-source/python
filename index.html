@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calamba Medical Center - Inventory Management</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-content">
+      <div class="logo">
+        <img src="img/logo2.png" alt="CMC Logo" />
+      </div>
+      <div class="loading-text">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="main-container" id="mainContainer">
+    <!-- Welcome Screen -->
+    <div class="welcome-container" id="welcomeContainer">
+      <div class="welcome-side">
+        <div class="logo-section">
+          <div class="logo">
+            <img src="img/logo2.png" alt="CMC Logo" />
+          </div>
+          <h1>ITAMS</h1>
+          <p>IT Assets Management System</p>
+          <p class="description">Efficiently manage and track all IT assets with our comprehensive inventory solution.</p>
+          <button class="get-started-btn" onclick="showLogin()">Get Started</button>
+        </div>
+      </div>
+      <div class="welcome-bg">
+        <div class="wave-animation"></div>
+        <div class="wave-animation1"></div>
+      </div>
+    </div>
+
+    <!-- Login Container -->
+    <div class="login-container" id="loginContainer" style="display: none;">
+      <div class="login-side">
+        <div class="login-form">
+          <div class="logo">
+            <img src="img/logo2.png" alt="CMC Logo" />
+          </div>
+          <h2>Welcome Back</h2>
+          <p>Sign in to your account</p>
+
+          <form id="loginForm">
+            <div class="form-group">
+              <input type="text" id="username" placeholder="Username" required />
+            </div>
+            <div class="form-group">
+              <input type="password" id="password" placeholder="Password" required />
+            </div>
+            <div class="form-options">
+              <label class="checkbox-container">
+                <input type="checkbox" id="rememberMe" />
+                <span class="checkmark"></span>
+                Remember Me
+              </label>
+              <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+            <button type="button" class="back-btn" onclick="showWelcome()">Back</button>
+          </form>
+        </div>
+      </div>
+      <div class="login-bg">
+        <div class="wave-animation"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Container -->
+  <div class="dashboard-container" id="dashboardContainer" style="display: none;">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-left">
+        <div class="logo"><h3>CMC</h3></div>
+        <ul class="nav-menu" id="navMenu"></ul>
+      </div>
+      <div class="nav-right">
+        <div class="notification-container">
+          <div class="notification-bell" onclick="toggleNotifications()">
+            🔔
+            <span id="notificationCount"></span>
+          </div>
+          <div id="notificationPanelNav"></div>
+        </div>
+        <div class="profile-dropdown">
+          <div class="profile-trigger" onclick="toggleProfile()">
+            <span class="profile-name" id="profileName">User</span>
+            <span class="dropdown-arrow">▼</span>
+          </div>
+          <div class="profile-menu" id="profileMenu">
+            <a href="#" onclick="showProfile()">Profile Details</a>
+            <a href="#" onclick="showHelp()">Help</a>
+            <a href="#" onclick="showAbout()">About</a>
+            <a href="#" onclick="logout()">Sign Out</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Dashboard -->
+      <div class="content-section" id="dashboardContent">
+        <div class="summary-cards">
+          <div class="card hover-effect" onclick="animateCard(this)">
+            <div class="card-content">
+              <h3>Total Assets</h3>
+              <div class="card-number" id="totalAssets">0</div>
+              <p class="card-change">+5% from last month</p>
+            </div>
+            <div class="card-icon">💻</div>
+          </div>
+          <div class="card hover-effect" onclick="animateCard(this)">
+            <div class="card-content">
+              <h3>In Use</h3>
+              <div class="card-number" id="inUse">0</div>
+              <p class="card-change">+2% from last month</p>
+            </div>
+            <div class="card-icon">✅</div>
+          </div>
+          <div class="card hover-effect" onclick="animateCard(this)">
+            <div class="card-content">
+              <h3>In Stock</h3>
+              <div class="card-number" id="inStock">0</div>
+              <p class="card-change">-1% from last month</p>
+            </div>
+            <div class="card-icon">📦</div>
+          </div>
+          <div class="card hover-effect" onclick="animateCard(this)">
+            <div class="card-content">
+              <h3>Maintenance</h3>
+              <div class="card-number" id="maintenance">0</div>
+              <p class="card-change">+10% from last month</p>
+            </div>
+            <div class="card-icon">🔧</div>
+          </div>
+        </div>
+
+        <div class="charts-section">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h3>Asset Status Distribution</h3>
+              <button class="download-btn" onclick="downloadChart('statusChart')">📥 Download</button>
+            </div>
+            <canvas id="statusChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <div class="chart-header">
+              <h3>Assets by Department</h3>
+              <button class="download-btn" onclick="downloadChart('departmentChart')">📥 Download</button>
+            </div>
+            <canvas id="departmentChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <div class="chart-header">
+              <h3>Monthly Asset Growth</h3>
+              <button class="download-btn" onclick="downloadChart('growthChart')">📥 Download</button>
+            </div>
+            <canvas id="growthChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <div class="chart-header">
+              <h3>Asset Types</h3>
+              <button class="download-btn" onclick="downloadChart('typeChart')">📥 Download</button>
+            </div>
+            <canvas id="typeChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <div class="chart-header">
+              <h3>RAM Distribution</h3>
+              <button class="download-btn" onclick="downloadChart('ramChart')">📥 Download</button>
+            </div>
+            <canvas id="ramChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <div class="chart-header">
+              <h3>Operating Systems</h3>
+              <button class="download-btn" onclick="downloadChart('osChart')">📥 Download</button>
+            </div>
+            <canvas id="osChart"></canvas>
+          </div>
+        </div>
+
+        <div class="export-section">
+          <button class="export-btn" onclick="exportData('csv')">📊 Export CSV</button>
+          <button class="export-btn" onclick="exportData('pdf')">📄 Export PDF</button>
+        </div>
+      </div>
+
+      <!-- Assets -->
+      <div class="content-section" id="assetsContent" style="display: none;">
+        <div class="summary-cards">
+          <div class="card hover-effect">
+            <div class="card-content">
+              <h3>Monitors</h3>
+              <div class="card-number" id="monitorCount">0</div>
+            </div>
+            <div class="card-icon">🖥️</div>
+          </div>
+          <div class="card hover-effect">
+            <div class="card-content">
+              <h3>System Units</h3>
+              <div class="card-number" id="systemCount">0</div>
+            </div>
+            <div class="card-icon">💻</div>
+          </div>
+          <div class="card hover-effect">
+            <div class="card-content">
+              <h3>Laptops</h3>
+              <div class="card-number" id="laptopCount">0</div>
+            </div>
+            <div class="card-icon">💻</div>
+          </div>
+          <div class="card hover-effect">
+            <div class="card-content">
+              <h3>Synology</h3>
+              <div class="card-number" id="synologyCount">0</div>
+            </div>
+            <div class="card-icon">🗄️</div>
+          </div>
+        </div>
+
+        <div class="assets-controls">
+          <div class="controls-left">
+            <button class="add-asset-btn" id="addAssetBtn" onclick="showAddAssetModal()">+ Add Asset</button>
+            <button class="upload-csv-btn" id="uploadCsvBtn" onclick="uploadCSV()">📤 Upload CSV</button>
+            <button class="download-csv-btn" onclick="downloadCSV()">📥 Download CSV</button>
+            <button class="add-asset-btn" id="reportIssueBtn" style="display:none;" onclick="showReportIssueModal()">🛠 Report Issue</button>
+          </div>
+          <div class="controls-right">
+            <input type="text" class="search-assets" placeholder="Search assets..." oninput="searchAssets(this.value)" />
+            <select class="filter-select" onchange="filterAssets('building', this.value)">
+              <option value="">All Buildings</option>
+              <option value="Tower1">Tower 1</option>
+              <option value="Tower2">Tower 2</option>
+              <option value="Tower3">Tower 3</option>
+              <option value="Tower4">Tower 4</option>
+            </select>
+            <select class="filter-select" onchange="filterAssets('department', this.value)">
+              <option value="">All Departments</option>
+              <option value="IT">IT Department</option>
+              <option value="HR">HR Department</option>
+              <option value="Finance">Finance</option>
+            </select>
+            <select class="filter-select" onchange="filterAssets('status', this.value)">
+              <option value="">All Status</option>
+              <option value="In Use">In Use</option>
+              <option value="In Stock">In Stock</option>
+              <option value="Maintenance">Maintenance</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="assets-table" id="assetsTable">
+            <thead>
+              <tr>
+                <th>CMC Code</th>
+                <th>Brand</th>
+                <th>Classification</th>
+                <th>Serial Number</th>
+                <th>Date Purchased</th>
+                <th>Host Name</th>
+                <th>OS</th>
+                <th>Status</th>
+                <th>RAM</th>
+                <th>Processor</th>
+                <th>IP Address</th>
+                <th>MAC Address</th>
+                <th>User</th>
+                <th>Department</th>
+                <th>Building</th>
+                <th>Remarks</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="assetsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Accounts -->
+      <div class="content-section" id="accountsContent" style="display: none;">
+        <div class="summary-cards">
+          <div class="card hover-effect">
+            <div class="card-content">
+              <h3>Total Accounts</h3>
+              <div class="card-number" id="totalAccountsCount">0</div>
+            </div>
+            <div class="card-icon">👥</div>
+          </div>
+          <div class="card hover-effect">
+            <div class="card-content">
+              <h3>Active Accounts</h3>
+              <div class="card-number" id="activeAccountsCount">0</div>
+            </div>
+            <div class="card-icon">👤</div>
+          </div>
+          <div class="card hover-effect">
+            <div class="card-content">
+              <h3>Inactive Accounts</h3>
+              <div class="card-number" id="inactiveAccountsCount">0</div>
+            </div>
+            <div class="card-icon">😴</div>
+          </div>
+          <div class="card hover-effect">
+            <div class="card-content">
+              <h3>Admin Accounts</h3>
+              <div class="card-number" id="adminAccountsCount">0</div>
+            </div>
+            <div class="card-icon">👑</div>
+          </div>
+        </div>
+
+        <div class="account-controls">
+          <div class="controls-left">
+            <button class="create-account-btn" onclick="showCreateAccountModal()" id="createAccountBtn" style="display: none;">+ Create Account</button>
+            <button class="export-accounts-btn" onclick="exportAccounts()">📤 Export CSV</button>
+          </div>
+          <div class="controls-right">
+            <input type="text" class="search-accounts" placeholder="Search accounts..." oninput="searchAccounts(this.value)" />
+            <select id="accountRoleFilter" onchange="filterAccounts('role', this.value)">
+              <option value="">All Roles</option>
+              <option value="Admin">Admin</option>
+              <option value="User">User</option>
+              <option value="Super Admin">Super Admin</option>
+            </select>
+            <select id="accountStatusFilter" onchange="filterAccounts('status', this.value)">
+              <option value="">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+            <select class="filter-select" onchange="filterAccounts('status', this.value)">
+              <option value="">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="accounts-table" id="accountsTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Password</th>
+                <th>Status</th>
+                <th>Last Login</th>
+                <th>Created At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="accountsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="content-section" id="historyContent" style="display: none;">
+        <div class="section-header">
+          <h2>Asset History</h2>
+          <div class="section-actions">
+            <button class="action-btn" onclick="exportHistory()">📊 Export History</button>
+            <button class="action-btn" onclick="loadHistoryData()">🔄 Refresh</button>
+          </div>
+        </div>
+
+        <div class="history-controls">
+          <div class="controls-row">
+            <div class="controls-left">
+              <div class="filter-group">
+                <input type="text" class="search-history" id="historySearch" placeholder="Search history..." oninput="searchHistory(this.value)" />
+              </div>
+              <div class="filter-group">
+                <select class="filter-select" id="historyTypeFilter" onchange="filterHistory('type', this.value)">
+                  <option value="">All Types</option>
+                  <option value="Asset">Asset Changes</option>
+                  <option value="Account">Account Changes</option>
+                  <option value="System">System</option>
+                  <option value="Login">Login/Logout</option>
+                  <option value="Import">Import</option>
+                  <option value="Export">Export</option>
+                </select>
+              </div>
+            </div>
+            <div class="controls-center">
+              <div class="filter-group">
+                <select id="historyUserFilter" class="filter-select" onchange="filterHistory('user', this.value)">
+                  <option value="">All Users</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <select id="historyActionFilter" class="filter-select" onchange="filterHistory('action', this.value)">
+                  <option value="">All Actions</option>
+                  <option value="Create">Create</option>
+                  <option value="Update">Update</option>
+                  <option value="Delete">Delete</option>
+                  <option value="Login">Login</option>
+                  <option value="Logout">Logout</option>
+                  <option value="Export">Export</option>
+                  <option value="Import">Import</option>
+                </select>
+              </div>
+            </div>
+            <div class="controls-right">
+              <div class="filter-group">
+                <input type="date" class="date-filter" id="historyDateFrom" onchange="applyDateFilter()" />
+                <span class="date-separator">to</span>
+                <input type="date" class="date-filter" id="historyDateTo" onchange="applyDateFilter()" />
+              </div>
+              <div class="filter-actions">
+                <button class="btn-clear" onclick="clearHistoryFilters()">Clear Filters</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-cards">
+          <div class="summary-card">
+            <div class="card-header"><h3>Total Records</h3><span class="card-icon">📊</span></div>
+            <div class="card-value" id="totalHistoryRecords">0</div>
+            <div class="card-label">All Time</div>
+          </div>
+          <div class="summary-card">
+            <div class="card-header"><h3>Today's Activity</h3><span class="card-icon">📅</span></div>
+            <div class="card-value" id="todayHistoryRecords">0</div>
+            <div class="card-label">Today</div>
+          </div>
+          <div class="summary-card">
+            <div class="card-header"><h3>Recent Changes</h3><span class="card-icon">🔄</span></div>
+            <div class="card-value" id="recentChanges">0</div>
+            <div class="card-label">Last 7 Days</div>
+          </div>
+          <div class="summary-card">
+            <div class="card-header"><h3>Active Users</h3><span class="card-icon">👥</span></div>
+            <div class="card-value" id="activeUsers">0</div>
+            <div class="card-label">This Month</div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <div class="table-header">
+            <h3>History Records</h3>
+            <div class="table-actions">
+              <span id="historyResultsCount" class="results-count"></span>
+              <button class="btn-export" onclick="exportHistory()">Export Filtered</button>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table class="history-table data-table" id="historyTable">
+              <thead>
+                <tr>
+                  <th onclick="sortHistoryTable(0)">Date <span class="sort-icon">⇅</span></th>
+                  <th onclick="sortHistoryTable(1)">Time <span class="sort-icon">⇅</span></th>
+                  <th onclick="sortHistoryTable(2)">User <span class="sort-icon">⇅</span></th>
+                  <th onclick="sortHistoryTable(3)">CMC Code <span class="sort-icon">⇅</span></th>
+                  <th onclick="sortHistoryTable(4)">Action <span class="sort-icon">⇅</span></th>
+                  <th onclick="sortHistoryTable(5)">Type <span class="sort-icon">⇅</span></th>
+                  <th onclick="sortHistoryTable(6)">Details <span class="sort-icon">⇅</span></th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <tr>
+                  <td colspan="8" class="history-loading">Loading history records...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="pagination-container">
+          <div class="pagination-info">
+            <span id="historyPaginationInfo">Showing 0 of 0 records</span>
+          </div>
+          <div class="pagination-controls">
+            <button id="historyPrevBtn" onclick="previousHistoryPage()" disabled>Previous</button>
+            <span id="historyPageNumbers"></span>
+            <button id="historyNextBtn" onclick="nextHistoryPage()" disabled>Next</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Logs -->
+      <div class="content-section" id="logsContent" style="display: none;">
+        <div class="section-header">
+          <h2>📊 Activity Logs</h2>
+          <div class="section-actions">
+            <div class="real-time-indicator">
+              <div class="status-dot active" id="realTimeStatus"></div>
+              <span>Real-time Updates</span>
+            </div>
+            <button class="action-btn refresh-btn" onclick="loadActivityLogs()" title="Refresh Logs">🔄 Refresh</button>
+            <button class="action-btn export-btn" onclick="exportLogs()" title="Export Filtered Logs">📊 Export</button>
+            <button class="action-btn clear-btn" onclick="clearLogs()" title="Clear Old Logs">🗑️ Clear Old</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card total">
+            <div class="stat-header"><h3>Total Logs</h3><span class="stat-icon">📊</span></div>
+            <div class="stat-value" id="totalLogs">0</div>
+            <div class="stat-label">All Time Records</div>
+          </div>
+          <div class="stat-card today">
+            <div class="stat-header"><h3>Today's Activity</h3><span class="stat-icon">📅</span></div>
+            <div class="stat-value" id="todayLogs">0</div>
+            <div class="stat-label">Activities Today</div>
+          </div>
+          <div class="stat-card week">
+            <div class="stat-header"><h3>This Week</h3><span class="stat-icon">📈</span></div>
+            <div class="stat-value" id="weekLogs">0</div>
+            <div class="stat-label">Last 7 Days</div>
+          </div>
+          <div class="stat-card users">
+            <div class="stat-header"><h3>Active Users</h3><span class="stat-icon">👥</span></div>
+            <div class="stat-value" id="activeLogUsers">0</div>
+            <div class="stat-label">Unique Users</div>
+          </div>
+        </div>
+
+        <div class="logs-controls">
+          <div class="controls-section search-section">
+            <div class="search-container">
+              <input type="text" class="search-input" id="logsSearch" placeholder="🔍 Search logs (user, action, details, IP...)" autocomplete="off" />
+              <button class="search-clear-btn" onclick="document.getElementById('logsSearch').value=''; searchLogs('');" title="Clear Search">❌</button>
+            </div>
+          </div>
+          <div class="controls-section filters-section">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label>👤 User:</label>
+                <select class="filter-select" id="userFilter" onchange="filterLogs('user', this.value)">
+                  <option value="">All Users</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>⚡ Action:</label>
+                <select class="filter-select" id="actionFilter" onchange="filterLogs('action', this.value)">
+                  <option value="">All Actions</option>
+                  <option value="Login">Login/Logout</option>
+                  <option value="Create">Create</option>
+                  <option value="Update">Update</option>
+                  <option value="Delete">Delete</option>
+                  <option value="Export">Export</option>
+                  <option value="Import">Import</option>
+                  <option value="Failed">Failed Actions</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>📂 Type:</label>
+                <select class="filter-select" id="typeFilter" onchange="filterLogs('type', this.value)">
+                  <option value="">All Types</option>
+                  <option value="Asset">Asset</option>
+                  <option value="Account">Account</option>
+                  <option value="System">System</option>
+                  <option value="Authentication">Authentication</option>
+                  <option value="Security">Security</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>🎯 Status:</label>
+                <select class="filter-select" id="statusFilter" onchange="filterLogs('status', this.value)">
+                  <option value="">All Status</option>
+                  <option value="Success">Success</option>
+                  <option value="Failed">Failed</option>
+                  <option value="Warning">Warning</option>
+                  <option value="Pending">Pending</option>
+                </select>
+              </div>
+            </div>
+            <div class="filter-row">
+              <div class="filter-group date-range">
+                <label>📅 Date Range:</label>
+                <input type="date" class="date-filter" id="logDateFrom" />
+                <span class="date-separator">to</span>
+                <input type="date" class="date-filter" id="logDateTo" />
+              </div>
+              <div class="filter-group actions">
+                <button class="btn-clear" onclick="clearLogFilters()" title="Clear All Filters">🧹 Clear Filters</button>
+                <button class="btn-refresh" onclick="loadActivityLogs()" title="Refresh Data">🔄 Refresh</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <div class="table-header">
+            <div class="table-title">
+              <h3>🗂️ Activity Records</h3>
+              <div class="table-subtitle">Comprehensive system activity tracking</div>
+            </div>
+            <div class="table-actions">
+              <span id="logsResultsCount" class="results-count">Loading...</span>
+              <div class="table-controls">
+                <label class="auto-refresh-toggle">
+                  <input type="checkbox" id="autoRefreshToggle" checked />
+                  <span>Auto-refresh</span>
+                </label>
+                <button class="btn-export compact" onclick="exportLogs()" title="Export Current View">💾 Export</button>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table class="logs-table enhanced-table" id="logsTable">
+              <thead>
+                <tr>
+                  <th class="sortable" onclick="sortLogsTable(0)">📅 Date & Time <span class="sort-icon">⇅</span></th>
+                  <th class="sortable" onclick="sortLogsTable(1)">👤 User & IP <span class="sort-icon">⇅</span></th>
+                  <th class="sortable" onclick="sortLogsTable(2)">⚡ Action <span class="sort-icon">⇅</span></th>
+                  <th class="sortable" onclick="sortLogsTable(3)">📂 Type <span class="sort-icon">⇅</span></th>
+                  <th class="sortable" onclick="sortLogsTable(4)">🏷️ CMC Code <span class="sort-icon">⇅</span></th>
+                  <th class="sortable" onclick="sortLogsTable(5)">📝 Details <span class="sort-icon">⇅</span></th>
+                  <th class="sortable" onclick="sortLogsTable(6)">🔗 Session <span class="sort-icon">⇅</span></th>
+                  <th class="actions-header">🛠️ Actions</th>
+                </tr>
+              </thead>
+              <tbody id="logsTableBody">
+                <tr class="loading-row">
+                  <td colspan="8" class="loading-cell">
+                    <div class="loading-container">
+                      <div class="loading-spinner"></div>
+                      <div class="loading-text">Loading activity logs...</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="pagination-container">
+          <div class="pagination-info">
+            <span id="historyPaginationInfo">Loading records...</span>
+            <div class="page-size-selector">
+              <label>Show:</label>
+              <select id="pageSizeSelect" onchange="changeLogsPageSize(this.value)">
+                <option value="25">25</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+              </select>
+              <span>per page</span>
+            </div>
+          </div>
+          <div class="pagination-controls">
+            <button id="historyPrevBtn2" class="page-btn" onclick="previousLogsPage()" disabled title="Previous Page">⬅️ Previous</button>
+            <div id="historyPageNumbers2" class="page-numbers"></div>
+            <button id="historyNextBtn2" class="page-btn" onclick="nextLogsPage()" disabled title="Next Page">Next ➡️</button>
+          </div>
+        </div>
+
+        <div class="quick-stats">
+          <div class="stat-item"><span class="stat-label">📊 Total Filtered:</span><span class="stat-value" id="filteredLogsCount">0</span></div>
+          <div class="stat-item"><span class="stat-label">⏱️ Last Updated:</span><span class="stat-value" id="lastLogsUpdate">Never</span></div>
+          <div class="stat-item"><span class="stat-label">🔄 Auto-refresh:</span><span class="stat-value" id="autoRefreshStatus">Active</span></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Notification Drawer Panel -->
+  <div class="notification-panel" id="notificationPanel">
+    <div class="notification-header">
+      <h3>Notifications</h3>
+      <button onclick="clearNotifications()">Clear All</button>
+    </div>
+    <div class="notification-list" id="notificationList"></div>
+  </div>
+
+  <!-- Modals -->
+  <!-- Add Asset Modal -->
+  <div class="modal" id="addAssetModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add New Asset</h3>
+        <button class="close" onclick="closeModal('addAssetModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="addAssetForm">
+          <div class="form-group">
+            <label>Classification</label>
+            <select name="classification" id="assetClassification" onchange="toggleAssetFields(this.value)" required>
+              <option value="">Select Classification</option>
+              <option value="Monitor">Monitor</option>
+              <option value="System Unit">System Unit</option>
+              <option value="Laptop">Laptop</option>
+              <option value="Synology">Synology</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>CMC Code</label>
+              <input type="text" name="cmcCode" id="cmcCode" required />
+            </div>
+            <div class="form-group">
+              <label>Brand</label>
+              <input type="text" name="brand" id="brand" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Serial Number</label>
+              <input type="text" name="serialNumber" id="serialNumber" required />
+            </div>
+            <div class="form-group">
+              <label>Date Purchased</label>
+              <input type="date" name="datePurchased" id="datePurchased" required />
+            </div>
+          </div>
+          <div id="extendedFields" style="display: none;">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Host Name</label>
+                <input type="text" name="hostName" id="hostName" />
+              </div>
+              <div class="form-group">
+                <label>Operating System</label>
+                <select name="operatingSystem" id="operatingSystem">
+                  <option value="">Select OS</option>
+                  <option value="Windows7">Windows 7</option>
+                  <option value="Windows7pro">Windows 7 Pro</option>
+                  <option value="Windows8">Windows 8</option>
+                  <option value="Windows8pro">Windows 8 Pro</option>
+                  <option value="Windows10">Windows 10</option>
+                  <option value="Windows10pro">Windows 10 Pro</option>
+                  <option value="Windows11">Windows 11</option>
+                  <option value="Windows11pro">Windows 11 Pro</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Status</label>
+                <select name="status" id="status">
+                  <option value="">Select Status</option>
+                  <option value="In Use">In Use</option>
+                  <option value="In Stock">In Stock</option>
+                  <option value="Maintenance">Maintenance</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>OS Status</label>
+                <select name="osStatus" id="osStatus">
+                  <option value="">Select OS Status</option>
+                  <option value="ready">READY</option>
+                  <option value="notready">NOT READY</option>
+                  <option value="activated">ACTIVATED</option>
+                  <option value="notcom">NOT COMPATIBLE FOR UPGRADE</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>RAM</label>
+                <select name="ram" id="ram">
+                  <option value="">Select RAM</option>
+                  <option value="4GB">4 GB</option>
+                  <option value="8GB">8 GB</option>
+                  <option value="12GB">12 GB</option>
+                  <option value="16GB">16 GB</option>
+                  <option value="32GB">32 GB</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Processor</label>
+                <input type="text" name="processor" id="processor" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>IP Address</label>
+                <input type="text" name="ipAddress" id="ipAddress" />
+              </div>
+              <div class="form-group">
+                <label>MAC Address</label>
+                <input type="text" name="macAddress" id="macAddress" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>User</label>
+                <input type="text" name="user" id="assetUser" />
+              </div>
+              <div class="form-group">
+                <label>Department</label>
+                <input type="text" name="department" id="department" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Building</label>
+              <select name="building" id="building">
+                <option value="">Select Building</option>
+                <option value="Tower1">Tower 1</option>
+                <option value="Tower2">Tower 2</option>
+                <option value="Tower3">Tower 3</option>
+                <option value="Tower4">Tower 4</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Remarks</label>
+            <textarea name="remarks" id="remarks" rows="3"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" onclick="closeModal('addAssetModal')">Cancel</button>
+            <button type="submit">Add Asset</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Account Modal -->
+  <div class="modal" id="createAccountModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Create New Account</h3>
+        <button class="close" onclick="closeModal('createAccountModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="createAccountForm">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" name="newUsername" id="newUsername" required />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="newPassword" id="newPassword" required minlength="6" />
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" name="confirmPassword" id="confirmPassword" required minlength="6" />
+          </div>
+          <div class="form-group">
+            <label>Role</label>
+            <select name="userRole" id="userRole" required>
+              <option value="">Select Role</option>
+              <option value="User">User</option>
+              <option value="Admin">Admin</option>
+              <option value="Super Admin">Super Admin</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="button" onclick="closeModal('createAccountModal')">Cancel</button>
+            <button type="submit">Create Account</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Asset Details Modal -->
+  <div class="modal" id="assetDetailsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Asset Details</h3>
+        <button class="close" onclick="closeModal('assetDetailsModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="assetDetailsContent"></div>
+    </div>
+  </div>
+
+  <!-- Upload CSV Modal -->
+  <div class="modal" id="uploadModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Upload CSV File</h3>
+        <button class="close" onclick="closeModal('uploadModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="uploadForm">
+          <div class="form-group">
+            <label>Select CSV File</label>
+            <input type="file" id="csvFile" accept=".csv" required />
+          </div>
+          <div class="form-note"><p>Note: Duplicates will be replaced based on Serial Number</p></div>
+          <div class="form-actions">
+            <button type="button" onclick="closeModal('uploadModal')">Cancel</button>
+            <button type="submit">Upload</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Asset Modal -->
+  <div id="editAssetModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit Asset</h3>
+        <button class="close" onclick="closeModal('editAssetModal')">&times;</button>
+      </div>
+      <form id="editAssetForm" class="modal-body">
+        <div class="form-group">
+          <label for="editCmcCode">CMC Code *</label>
+          <input type="text" id="editCmcCode" name="cmcCode" required />
+        </div>
+        <div class="form-group">
+          <label for="editBrand">Brand *</label>
+          <input type="text" id="editBrand" name="brand" required />
+        </div>
+        <div class="form-group">
+          <label for="editClassification">Classification *</label>
+          <select id="editClassification" name="classification" required onchange="toggleAssetFields(this.value)">
+            <option value="">Select Classification</option>
+            <option value="System Unit">System Unit</option>
+            <option value="Monitor">Monitor</option>
+            <option value="Laptop">Laptop</option>
+            <option value="Synology">Synology</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="editSerialNumber">Serial Number *</label>
+          <input type="text" id="editSerialNumber" name="serialNumber" required />
+        </div>
+        <div class="form-group">
+          <label for="editDatePurchased">Date Purchased *</label>
+          <input type="date" id="editDatePurchased" name="datePurchased" required />
+        </div>
+        <div id="editExtendedFields">
+          <div class="form-group"><label for="editHostName">Host Name</label><input type="text" id="editHostName" name="hostName" /></div>
+          <div class="form-group"><label for="editOperatingSystem">Operating System</label><input type="text" id="editOperatingSystem" name="operatingSystem" /></div>
+          <div class="form-group">
+            <label for="editOsStatus">OS Status</label>
+            <select id="editOsStatus" name="osStatus">
+              <option value="">Select Status</option>
+              <option value="Activated">Activated</option>
+              <option value="Not Activated">Not Activated</option>
+            </select>
+          </div>
+          <div class="form-group"><label for="editRam">RAM</label><input type="text" id="editRam" name="ram" /></div>
+          <div class="form-group"><label for="editProcessor">Processor</label><input type="text" id="editProcessor" name="processor" /></div>
+          <div class="form-group"><label for="editIpAddress">IP Address</label><input type="text" id="editIpAddress" name="ipAddress" /></div>
+          <div class="form-group"><label for="editMacAddress">MAC Address</label><input type="text" id="editMacAddress" name="macAddress" /></div>
+        </div>
+        <div class="form-group">
+          <label for="editStatus">Status</label>
+          <select id="editStatus" name="status">
+            <option value="In Stock">In Stock</option>
+            <option value="In Use">In Use</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Retired">Retired</option>
+          </select>
+        </div>
+        <div class="form-group"><label for="editUser">User</label><input type="text" id="editUser" name="user" /></div>
+        <div class="form-group"><label for="editDepartment">Department</label><input type="text" id="editDepartment" name="department" /></div>
+        <div class="form-group"><label for="editBuilding">Building</label><input type="text" id="editBuilding" name="building" /></div>
+        <div class="form-group"><label for="editRemarks">Remarks</label><textarea id="editRemarks" name="remarks" rows="3"></textarea></div>
+        <div class="form-actions">
+          <button type="submit">Update Asset</button>
+          <button type="button" onclick="closeModal('editAssetModal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="helpModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Help & FAQs</h3>
+        <button class="close" onclick="closeModal('helpModal')">&times;</button>
+      </div>
+      <div class="modal-body help-content">
+        <div class="form-group">
+          <input type="text" id="helpSearch" placeholder="Search FAQs..." oninput="filterFaqs(this.value)" />
+        </div>
+        <div id="faqList">
+          <div class="faq-item">
+            <div class="faq-question">How do I add a new asset?</div>
+            <div class="faq-answer">Go to Inventory and click on + Add Asset. Fill in the required details and submit.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">Why can't I edit assets?</div>
+            <div class="faq-answer">Only Admin and Super Admin roles can add, edit, delete, or import assets.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">How do I report an issue?</div>
+            <div class="faq-answer">Click on the Report Issue button in Inventory, enter CMC code and department, and submit.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Modal -->
+  <div class="modal" id="aboutModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>About</h3>
+        <button class="close" onclick="closeModal('aboutModal')">&times;</button>
+      </div>
+      <div class="modal-body about-content">
+        <div class="about-section">
+          <p>Calamba Medical Center - IT Assets Management System</p>
+          <p>Professional, secure, and efficient asset tracking for hospital operations.</p>
+        </div>
+        <div class="copyright">© <span id="copyrightYear"></span> Calamba Medical Center</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Issue Modal -->
+  <div class="modal" id="reportIssueModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Report Asset Issue</h3>
+        <button class="close" onclick="closeModal('reportIssueModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="reportIssueForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>CMC Code</label>
+              <input type="text" id="issueCmcCode" name="cmcCode" required />
+            </div>
+            <div class="form-group">
+              <label>Department</label>
+              <input type="text" id="issueDepartment" name="department" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="issueDescription" name="description" rows="3" placeholder="Describe the issue..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" onclick="closeModal('reportIssueModal')">Cancel</button>
+            <button type="submit">Submit Issue</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal delete-confirmation" id="deleteConfirmationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Confirm Delete</h3>
+        <button class="close" onclick="closeModal('deleteConfirmationModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="warning-message"><p>This action cannot be undone.</p></div>
+        <div class="account-info"><p id="deleteItemInfo"></p></div>
+        <div class="confirmation-input">
+          <label>Type DELETE to confirm</label>
+          <input type="text" id="deleteConfirmInput" placeholder="DELETE" />
+        </div>
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" onclick="closeModal('deleteConfirmationModal')">Cancel</button>
+          <button type="button" class="delete-btn" id="confirmDeleteBtn" disabled>Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS modules -->
+  <script src="javascript/accounts-table.js"></script>
+  <script src="javascript/activity-logger.js"></script>
+  <script src="javascript/api.js"></script>
+  <script src="javascript/utils.js"></script>
+  <script src="javascript/notifications.js"></script>
+  <script src="javascript/auth.js"></script>
+  <script src="javascript/dashboard.js"></script>
+  <script src="javascript/assets.js"></script>
+  <script src="javascript/accounts.js"></script>
+  <script src="javascript/history.js"></script>
+  <script src="javascript/logs.js"></script>
+  <script src="javascript/main.js"></script>
+</body>
+</html>
